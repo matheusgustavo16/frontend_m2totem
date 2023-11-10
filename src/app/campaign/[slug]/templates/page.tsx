@@ -63,6 +63,7 @@ export default function PageTemplates({ params: { slug } }: PageProps){
       }
     }catch(err:any){
       setProcessing(false);
+      setCountdown(null);
       toast.error(`Falha ao processar a imagem, tente novamente mais tarde...`);
       console.log('captureError', err);
     }
