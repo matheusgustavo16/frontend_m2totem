@@ -4,7 +4,8 @@ const nextConfig = {
     domains: ["firebasestorage.googleapis.com", "localhost"]
   },
   env: {
-    NEXT_EMAIL_ADMIN: process.env.NEXT_EMAIL_ADMIN || ""
+    NEXT_EMAIL_ADMIN: process.env.NEXT_EMAIL_ADMIN || "",
+    API_URL: process.env.API_URL || ""
   }
 };
 
