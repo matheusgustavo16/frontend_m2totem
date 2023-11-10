@@ -11,6 +11,7 @@ import QRCode from "react-qr-code"
 import { AddQrPicture, GetCampaign, GetTemplates } from "@/app/api/services/firebase"
 import { ref, uploadString } from "firebase/storage"
 import { storage } from "@/utils/firebase"
+import toast from "react-hot-toast"
 
 type PageProps = {
   params: {
@@ -62,6 +63,7 @@ export default function PageTemplates({ params: { slug } }: PageProps){
       }
     }catch(err:any){
       setProcessing(false);
+      toast.error(`Falha ao processar a imagem, tente novamente mais tarde...`);
       console.log('captureError', err);
     }
   };
