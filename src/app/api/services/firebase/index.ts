@@ -122,6 +122,51 @@ export const DeleteTemplate = async (docId: string) => {
   }
 };
 
+/* PHRASES */
+
+export const GetPhrases = async (campaignId: string) => {
+  try {
+    const campaignCollection = collection(db, "phrases");
+    const querySnapshot = await getDocs(
+      query(campaignCollection, orderBy("createdAt", "desc"))
+    );
+    const campaigns: any = [];
+    querySnapshot.forEach(doc => {
+      const campdata = doc.data();
+      // console.log("GetTemplates[template]", campaigns);
+      if (campaignId === campdata.campaign_id) {
+        campaigns.push({ id: doc.id, ...campdata });
+      }
+    });
+    // console.log("GetPhrases", campaigns);
+    return campaigns;
+  } catch (err) {
+    console.log("GetPhrasesError", err);
+  }
+};
+
+export const AddPhrases = async (data: any) => {
+  try {
+    const campaignCollection = collection(db, "phrases");
+    const querySnapshot = await addDoc(campaignCollection, { ...data });
+    console.log("AddPhrases", querySnapshot);
+    return querySnapshot ? querySnapshot.id : null;
+  } catch (err) {
+    console.log("AddPhrasesError", err);
+  }
+};
+
+export const DeletePhrases = async (docId: string) => {
+  try {
+    const docCollection = doc(db, "phrases", docId);
+    const querySnapshot = await deleteDoc(docCollection);
+    console.log("DeletePhrases", querySnapshot);
+    return querySnapshot;
+  } catch (err) {
+    console.log("DeletePhrasesError", err);
+  }
+};
+
 /* QR CODES */
 
 export const AddQrPicture = async (data: any) => {

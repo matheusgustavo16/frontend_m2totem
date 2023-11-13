@@ -6,12 +6,12 @@ import CountdownComponent from "@/components/countdown"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Webcam from "react-webcam"
-import { removeBg } from "@/app/api/services/photo"
 import QRCode from "react-qr-code"
-import { AddQrPicture, GetCampaign, GetTemplates } from "@/app/api/services/firebase"
+import { AddQrPicture, GetCampaign, GetPhrases, GetTemplates } from "@/app/api/services/firebase"
 import { ref, uploadString } from "firebase/storage"
 import { storage } from "@/utils/firebase"
 import toast from "react-hot-toast"
+import { applyPhraseToPicture, removeBg } from "@/app/api/services/photo"
 
 type PageProps = {
   params: {
@@ -26,6 +26,7 @@ export default function PageTemplates({ params: { slug } }: PageProps){
   const [template, setTemplate] = useState<any>({});
 
   const [templates, setTemplates] = useState<any>([]);
+  const [phrases, setPhrases] = useState<any>([]);
   const [countdown, setCountdown] = useState<number|null>(null);
   const [preview, setPreview] = useState<string|null>(null);
   const [processing, setProcessing] = useState<boolean>(false);
@@ -38,6 +39,12 @@ export default function PageTemplates({ params: { slug } }: PageProps){
     templatesData[0] && setTemplate(templatesData[0]);
     const _campaignData:any = await GetCampaign(slug);
     setCampaignData(_campaignData);
+    await getPhrases();
+  };
+
+  const getPhrases = async() => {
+    const templatesData:any = await GetPhrases(slug);
+    setPhrases(templatesData);
   };
 
   useEffect(()=>{
@@ -79,6 +86,12 @@ export default function PageTemplates({ params: { slug } }: PageProps){
     // setPreview('image');
   };
 
+  const startCountdownToHome = () => {    
+    setTimeout(() => {
+      router.push(`/campaign/${slug}`);
+    }, 20000);
+  }
+
   const handleUploadFile = async (imageFile: any) => {
     if(imageFile){
       const name = new Date().toISOString();
@@ -93,6 +106,7 @@ export default function PageTemplates({ params: { slug } }: PageProps){
           if(addQr){
             setQrCode(`${window.location.origin}/campaign/${slug}/download/${addQr}`);
             setDownload(true);
+            startCountdownToHome();
           }
         })
         .catch((err) => {
@@ -104,13 +118,25 @@ export default function PageTemplates({ params: { slug } }: PageProps){
     }
   };
 
-  const onHandleApproveButton = async(approved: number) => {
+  const applyPhrase = async (image: string, phrase: string) => {
+    try{
+      const applied:any = await applyPhraseToPicture(image, phrase);
+      // console.log('applyPhrase', applied);
+      await handleUploadFile(applied.photo);
+    }catch(err:any){
+      toast.error(`Falha ao aplicar a frase na imagem, tente novamente mais tarde...`);
+      console.log('captureError', err);
+    }
+  };
+
+  const onHandleApproveButton = async(approved: number, phrase?: string|null) => {
     // clicou na aprovação
     if(approved && preview){
-      await handleUploadFile(preview);
-      setTimeout(() => {
-        router.push(`/campaign/${slug}`);
-      }, 20000);
+      if(!phrase){
+        toast.error(`Selecione uma frase a ser aplicada!`);
+      }else{
+        await applyPhrase(preview, phrase);
+      }
     }else{
       setQrCode(null);
       setDownload(false);
@@ -123,7 +149,7 @@ export default function PageTemplates({ params: { slug } }: PageProps){
     {typeof countdown === 'number' && <CountdownComponent seconds={countdown} onFinish={onFinishCountdown} />}
     {!download && !preview && <>
       <div className={`w-full text-center py-8 px-12 flex flex-col ${typeof countdown !== 'number' ? `` : `absolute -top-[999%] -left-[999%]`}`}>
-        <div className="text-white relative bg-black my-6 min-w-[400px] min-h-[300px] m-auto rounded-xl flex justify-center items-center overflow-hidden">
+        <div className="text-white relative bg-black my-6 min-w-[100%] min-h-[400px] m-auto rounded-xl flex justify-center items-center overflow-hidden">
           <div className="absolute w-full h-full bg-black">
             {template && template.bg && template.bg !== '' && <Image
               src={template.bg}
@@ -138,12 +164,12 @@ export default function PageTemplates({ params: { slug } }: PageProps){
             <Webcam
               ref={videoRef}
               audio={false}
-              width={400}
+              width={"100%"}
               height={300}
               screenshotFormat="image/jpeg"
               screenshotQuality={100}
-              minScreenshotHeight={600}
               minScreenshotWidth={800}
+              minScreenshotHeight={600}
               videoConstraints={{
                 width: 400,
                 height: 300,
@@ -210,6 +236,7 @@ export default function PageTemplates({ params: { slug } }: PageProps){
     </>}
     {!download && preview && preview !== "" && <ApprovePictureComponent
       phrase_approve={campaignData.phrase_approve ? campaignData.phrase_approve.stringValue : null}
+      phrases_list={phrases}
       preview={preview}
       handleButton={onHandleApproveButton}
     />}

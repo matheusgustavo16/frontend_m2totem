@@ -24,7 +24,7 @@ export default function RootDashboard({
       </LayoutDash>
     </>}
     {session && session?.data?.user?.email !== process.env.NEXT_EMAIL_ADMIN && <>
-      ⚠️ Acesso bloqueado, área somente para administradores.    
+      ⚠️ Acesso bloqueado, área somente para administradores.
     </>}
   </>)
 };

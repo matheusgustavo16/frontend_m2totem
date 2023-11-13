@@ -11,8 +11,10 @@
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@types/bcryptjs": "^2.4.6",
     "@types/qrcode": "^1.5.4",
     "axios": "^1.6.0",
+    "bcryptjs": "^2.4.3",
     "firebase": "^10.5.2",
     "lucide-react": "^0.291.0",
     "next": "14.0.0",

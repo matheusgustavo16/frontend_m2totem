@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { storage } from "@/utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { Trash2, Users } from "lucide-react";
+import { Camera, Trash2, Users } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import { AddTemplate, DeleteTemplate, GetTemplates } from "@/app/api/services/firebase";
+import { AddPhrases, AddTemplate, DeletePhrases, DeleteTemplate, GetPhrases, GetTemplates } from "@/app/api/services/firebase";
 
 type PageProps = {
   params: {
@@ -17,6 +17,7 @@ type PageProps = {
 export default function PageCampaignSlug({ params: { slug } }: PageProps){
 
   const [templates, setTemplates] = useState<any>([]);
+  const [phrases, setPhrases] = useState<any>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [progressUpload, setProgressUpload] = useState(0);
 
@@ -29,7 +30,21 @@ export default function PageCampaignSlug({ params: { slug } }: PageProps){
     if(!templates || templates.length <= 0){
       getTemplates();
     }
-  }, [])
+    if(!phrases || phrases.length <= 0){
+      getPhrases();
+    }
+  }, []);
+
+  const getPhrases = async() => {
+    try{
+      const _phrases = await GetPhrases(slug);
+      // console.log('getPhrases', _phrases);
+      setPhrases(_phrases);
+    }catch(erR){
+      setPhrases([]);
+      console.log('getPhrasesError', erR);
+    }
+  };
 
   const getTemplates = async() => {
     try{
@@ -40,7 +55,7 @@ export default function PageCampaignSlug({ params: { slug } }: PageProps){
       setTemplates([]);
       console.log('getTemplatesError', erR);
     }
-  }
+  };
 
   const handleSelectedFile = (form_field: string, files: any) => {
     if (files && files[0] && files[0].size < 10000000) {
@@ -114,7 +129,61 @@ export default function PageCampaignSlug({ params: { slug } }: PageProps){
     }catch(err){
       console.log('handleDeleteTemplateError', err);
     }
-  }
+  };
+
+  const handleSelectedPhrase = async (files:any) => {
+    if (files && files[0] && files[0].size < 10000000) {
+      try{
+        const imageFile = files[0];
+        const name = imageFile.name;
+        const storageRef = ref(storage, `phrases/${new Date().getTime()}_${name}`);
+        const uploadImage = uploadBytesResumable(storageRef, imageFile);
+        uploadImage.on(
+          'state_changed',
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            setProgressUpload(progress)
+            switch (snapshot.state) {
+              case 'paused':
+                console.log('Upload is paused')
+                break
+              case 'running':
+                console.log('Upload is running')
+                break
+            }
+          },
+          (error) => {
+            console.log('handleUploadFileError', error);
+          },
+          () => {
+            getDownloadURL(uploadImage.snapshot.ref).then(async (url) => {
+              const dataAddTemplate:any = await AddPhrases({
+                phrase: url,
+                campaign_id: slug,
+                createdAt: new Date().toISOString()
+              });
+              console.log('handleAddPhrase', dataAddTemplate);
+              await getPhrases();
+            })
+          },
+        )
+      }catch(err){
+        console.log('handleSelectedPhraseError', err);
+      }
+    } else {
+      toast.error(`Erro ao fazer o upload da frase selecionada.`)
+    }
+  };
+
+  const handleDeletePhrase = async (phraseId: string) => {
+    try{
+      await DeletePhrases(phraseId);
+      await getPhrases();
+    }catch(err){
+      console.log('handleDeleteTemplateError', err);
+    }
+  };
   
   return (<>
     <header className="bg-white shadow">
@@ -206,7 +275,8 @@ export default function PageCampaignSlug({ params: { slug } }: PageProps){
               <div className="border-b border-gray-900/10 pb-12">
                 <h2 className="text-base font-semibold leading-7 text-gray-900">Templates Cadastrados</h2>
                 <p className="mt-1 text-sm leading-6 text-gray-600">
-                  Envie a imagem de background e a imagem de gabarito.
+                  As imagens de background e gabarito devem ter as mesmas dimensões.<br/>
+                  min.: 800x600px
                 </p>
 
                 {templates.length <=0 && <>
@@ -247,6 +317,63 @@ export default function PageCampaignSlug({ params: { slug } }: PageProps){
                           <p className="pointer-events-none block text-sm font-medium text-gray-500">{new Date(file.createdAt).toLocaleString('pt-br')}</p>
                         </div>
                         <button onClick={() => handleDeleteTemplate(file.id)} className="pt-2 cursor-pointer">
+                          <Trash2 size={19} className="text-red-600  hover:text-red-700 transition duration-300 ease-in-out" />
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>}
+
+              </div>
+            </div>
+            <div className="space-y-12 mt-12">
+              <div className="border-b border-gray-900/10 pb-12">
+                <h2 className="text-base font-semibold leading-7 text-gray-900">Frases de Aplicação</h2>
+                <p className="mt-1 text-sm leading-6 text-gray-600">
+                  As imagens de frase devem ser PNG sem fundo, e da mesma dimensão das imagens de fundo e gabarito.<br/>
+                  min.: 800x600px
+                </p>
+
+                <div className="col-span-full mt-8">
+                  <div style={{}} className={`mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 ${phrases.length <= 0 ? `py-10` : `py-1`} bg-contain`}>
+                    <div className={`text-center bg-white p-4 rounded-lg`}>
+                      <Camera className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
+                      <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                        <label
+                          htmlFor="file-upload"
+                          className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                        >
+                          <span>Selecionar arquivo</span>
+                          <input
+                            id="file-upload"
+                            name="file-upload"
+                            type="file"
+                            className="sr-only"
+                            onChange={(files) => handleSelectedPhrase(files.target.files)}
+                          />
+                        </label>
+                        <p className="pl-1">ou clique e arraste pra cá</p>
+                      </div>
+                      <p className="text-xs leading-5 text-gray-600">PNG up to 10MB</p>
+                    </div>
+                  </div>
+                </div>
+
+                {phrases.length >=1 && <ul role="list" className="mt-12 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+                  {phrases.map((file:any, k:number) => (
+                    <li key={k} className="relative">
+                      <div className="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                        <img src={file.phrase} alt="" className="pointer-events-none object-cover group-hover:opacity-100" />
+                        <button type="button" className="absolute inset-0 focus:outline-none">
+                          <span className="sr-only">View details for {file.title}</span>
+                        </button>
+                      </div>
+                      <div className="w-full flex justify-between items-center">
+                        <div className="">
+                          <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">#{file.id}</p>
+                          <p className="pointer-events-none block text-sm font-medium text-gray-500">{new Date(file.createdAt).toLocaleString('pt-br')}</p>
+                        </div>
+                        <button onClick={() => handleDeletePhrase(file.id)} className="pt-2 cursor-pointer">
                           <Trash2 size={19} className="text-red-600  hover:text-red-700 transition duration-300 ease-in-out" />
                         </button>
                       </div>
