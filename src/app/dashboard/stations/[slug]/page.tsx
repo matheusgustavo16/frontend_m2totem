@@ -44,7 +44,7 @@ export default async function PageCampaignSlug({ params: { slug } }: PageProps){
           </h2>
           
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {list && list.map((pic: any) => <div>
+              {list && list.map((pic: any, k:number) => <div key={k}>
                   <img className="h-auto max-w-full rounded-lg" src={pic.picture} alt="" />
               </div>)}
           </div>
