@@ -1,3 +1,6 @@
+import ActivityFeed from "@/components/dashboard/feed";
+import GeneralStats from "@/components/dashboard/generalStats";
+
 export default function DashboardPage() {
   return (<>
     <header className="bg-white shadow">
@@ -7,7 +10,9 @@ export default function DashboardPage() {
     </header>
     <main>
       <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-        AQUI VAI OS DASHBOARD COMPONENTS
+        <GeneralStats />
+        {/* LISTA FEED */}
+        <ActivityFeed />
       </div>
     </main>
   </>)

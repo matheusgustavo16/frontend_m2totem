@@ -1,4 +1,5 @@
 import { GetCampaign } from '@/app/api/services/firebase';
+import LocationTag from '@/components/locationTag';
 import type { Metadata } from 'next'
 import Image from 'next/image'
 
@@ -25,6 +26,7 @@ export default async function CampaignLayout({
           {children}
         </div>
       </div>
+      <LocationTag />
     </body>
   )
 }

@@ -49,7 +49,7 @@ export default function PageTemplates({ params: { slug } }: PageProps){
 
   useEffect(()=>{
     getTemplates();
-  }, [])
+  }, []);
 
   const capture = useCallback(() => {
     setDownload(false);
@@ -94,14 +94,17 @@ export default function PageTemplates({ params: { slug } }: PageProps){
 
   const handleUploadFile = async (imageFile: any) => {
     if(imageFile){
-      const name = new Date().toISOString();
+      const name = new Date().getTime();
+      // const name = new Date().toISOString();
       const storageRef = ref(storage, `pictures/${name}.jpg`);
       uploadString(storageRef, imageFile, 'data_url')
         .then(async(data:any) => {
-          // console.log("uploadString", data);
+          // console.log("handleUploadFile", data);
           const addQr:any = await AddQrPicture({
             createdAt: new Date().toISOString(),
-            picture: `https://firebasestorage.googleapis.com/v0/b/m2totem.appspot.com/o/${data.metadata.fullpath}?alt=media`
+            stationId: localStorage.getItem("stationId") || "Não Identificada",
+            campaignId: slug,
+            picture: `https://firebasestorage.googleapis.com/v0/b/m2totem.appspot.com/o/${data.metadata.fullPath.replaceAll('/','%2F')}?alt=media`
           });
           if(addQr){
             setQrCode(`${window.location.origin}/campaign/${slug}/download/${addQr}`);
@@ -148,7 +151,7 @@ export default function PageTemplates({ params: { slug } }: PageProps){
   return (<>
     {typeof countdown === 'number' && <CountdownComponent seconds={countdown} onFinish={onFinishCountdown} />}
     {!download && !preview && <>
-      <div className={`w-full text-center py-8 px-12 flex flex-col ${typeof countdown !== 'number' ? `` : `absolute -top-[999%] -left-[999%]`}`}>
+      <div className={`w-full text-center py-8 lg:px-12 flex flex-col ${typeof countdown !== 'number' ? `` : `absolute -top-[999%] -left-[999%]`}`}>
         <div className="text-white relative bg-black my-6 min-w-[100%] min-h-[400px] m-auto rounded-xl flex justify-center items-center overflow-hidden">
           <div className="absolute w-full h-full bg-black">
             {template && template.bg && template.bg !== '' && <Image

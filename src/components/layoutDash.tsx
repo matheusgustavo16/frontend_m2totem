@@ -1,7 +1,7 @@
 'use client'
 
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bell, X, Menu as MenuIcon } from 'lucide-react'
+import { Bell, X, Menu as MenuIcon, User2 } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -32,13 +32,6 @@ export default function LayoutDash({ children }: { children: React.ReactNode }) 
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 hidden">
-                      <img
-                        className="h-8 w-8"
-                        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
-                        alt="Your Company"
-                      />
-                    </div>
                     <div className="hidden md:block">
                       <div className="ml-0 flex items-baseline space-x-4">
                         {navigation.map((item) => (
@@ -61,22 +54,14 @@ export default function LayoutDash({ children }: { children: React.ReactNode }) 
                   </div>
                   <div className="hidden md:block">
                     <div className="ml-4 flex items-center md:ml-6">
-                      <button
-                        type="button"
-                        className="relative rounded-full bg-indigo-600 p-1 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
-                      >
-                        <span className="absolute -inset-1.5" />
-                        <span className="sr-only">View notifications</span>
-                        <Bell className="h-6 w-6" aria-hidden="true" />
-                      </button>
 
                       {/* Profile dropdown */}
                       <Menu as="div" className="relative ml-3">
                         <div>
-                          <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-indigo-600 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600">
+                          <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-indigo-800 p-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600">
                             <span className="absolute -inset-1.5" />
                             <span className="sr-only">Open user menu</span>
-                            <img className="h-8 w-8 rounded-full" src={``} alt="" />
+                            <User2 className='text-zinc-100' />
                           </Menu.Button>
                         </div>
                         <Transition

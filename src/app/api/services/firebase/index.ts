@@ -10,7 +10,10 @@ import {
   orderBy,
   doc,
   updateDoc,
-  getDoc
+  getDoc,
+  limit,
+  where,
+  getCountFromServer
 } from "firebase/firestore";
 
 /* CAMPAIGNS */
@@ -37,7 +40,7 @@ export const GetCampaign = async (docId: string) => {
   try {
     const campaignCollection = doc(db, "campaigns", docId);
     const querySnapshot: any = await getDoc(campaignCollection);
-    console.log("GetCampaign", querySnapshot);
+    // console.log("GetCampaign", querySnapshot);
     return querySnapshot._document.data.value.mapValue.fields;
   } catch (err) {
     console.log("GetCampaignError", err);
@@ -177,5 +180,204 @@ export const AddQrPicture = async (data: any) => {
     return querySnapshot ? querySnapshot.id : null;
   } catch (err) {
     console.log("AddQrPictureError", err);
+  }
+};
+
+export const GetDownloadPicture = async (docId: string) => {
+  try {
+    const campaignCollection = doc(db, "pictures", docId);
+    const querySnapshot: any = await getDoc(campaignCollection);
+    console.log("GetDownloadPicture", querySnapshot);
+    return querySnapshot._document.data.value.mapValue.fields;
+  } catch (err) {
+    console.log("GetDownloadPictureError", err);
+  }
+};
+
+/* STATS */
+
+export const GetStatsDashboard = async () => {
+  try {
+    // campanhas
+    const campaignCollection = collection(db, "campaigns");
+    const querySnapshot = await getDocs(
+      query(campaignCollection, orderBy("createdAt", "desc"))
+    );
+    const campaigns: any = [];
+    querySnapshot.forEach(doc => {
+      const campdata = doc.data();
+      campaigns.push({ id: doc.id, ...campdata });
+    });
+    // stations
+    const stationsCollection = collection(db, "stations");
+    const querySnapshotStation = await getDocs(
+      query(stationsCollection, orderBy("createdAt", "desc"))
+    );
+    const stations: any = [];
+    querySnapshotStation.forEach(doc => {
+      const campdata = doc.data();
+      stations.push({ id: doc.id, ...campdata });
+    });
+    // pictures
+    const picturesCollection = collection(db, "pictures");
+    const querySnapshotPic = await getDocs(
+      query(picturesCollection, orderBy("createdAt", "desc"))
+    );
+    const pictures: any = [];
+    querySnapshotPic.forEach(doc => {
+      const campdata = doc.data();
+      pictures.push({ id: doc.id, ...campdata });
+    });
+    // RETURN STATS
+    return {
+      countCampaigns: campaigns.length || 0,
+      countStations: stations.length || 0,
+      countPictures: pictures.length || 0
+    };
+  } catch (err) {
+    console.log("GetCampaignsError", err);
+  }
+};
+
+export const GetFeedDashboard = async () => {
+  try {
+    // campanhas
+    const campaignCollection = collection(db, "campaigns");
+    const querySnapshot = await getDocs(
+      query(campaignCollection, orderBy("createdAt", "desc"), limit(25))
+    );
+    const campaigns: any = [];
+    querySnapshot.forEach(doc => {
+      const campdata = doc.data();
+      campaigns.push({
+        id: doc.id,
+        date: new Date(campdata.createdAt),
+        type: "campaigns",
+        ...campdata
+      });
+    });
+    // stations
+    const stationsCollection = collection(db, "stations");
+    const querySnapshotStation = await getDocs(
+      query(stationsCollection, orderBy("createdAt", "desc"), limit(25))
+    );
+    const stations: any = [];
+    querySnapshotStation.forEach(doc => {
+      const campdata = doc.data();
+      stations.push({
+        id: doc.id,
+        date: new Date(campdata.createdAt),
+        type: "stations",
+        ...campdata
+      });
+    });
+    // pictures
+    const picturesCollection = collection(db, "pictures");
+    const querySnapshotPic = await getDocs(
+      query(picturesCollection, orderBy("createdAt", "desc"), limit(25))
+    );
+    const pictures: any = [];
+    querySnapshotPic.forEach(doc => {
+      const campdata = doc.data();
+      pictures.push({
+        id: doc.id,
+        date: new Date(campdata.createdAt),
+        type: "pictures",
+        ...campdata
+      });
+    });
+    // RETURN STATS
+    const reorder = [...campaigns, ...stations, ...pictures].sort(
+      (objA, objB) => Number(objB.date) - Number(objA.date)
+    );
+    return reorder;
+  } catch (err) {
+    console.log("GetCampaignsError", err);
+  }
+};
+
+/* STATIONS */
+
+export const AddStation = async (data: any) => {
+  try {
+    const stationsCollection = collection(db, "stations");
+    // before add, verify postcode and redirect
+    let token = null;
+    try {
+      const findPostcode = await getDocs(
+        query(stationsCollection, where("postcode", "==", data.postcode))
+      );
+      const station: any = [];
+      findPostcode.forEach(doc => {
+        const campdata = doc.data();
+        station.push({ id: doc.id, ...campdata });
+      });
+      // console.log("station", station);
+      token = station[0].id;
+    } catch (err) {
+      console.log("findPostcodeError", err);
+    }
+    if (token) return token;
+    // follow up
+    if (!token) {
+      const querySnapshot = await addDoc(stationsCollection, { ...data });
+      // console.log("AddStation", querySnapshot);
+      return querySnapshot ? querySnapshot.id : null;
+    }
+  } catch (err) {
+    console.log("AddStationError", err);
+  }
+};
+
+export const GetStations = async () => {
+  try {
+    const campaignCollection = collection(db, "stations");
+    const querySnapshot = await getDocs(
+      query(campaignCollection, orderBy("createdAt", "desc"))
+    );
+    const stations: any = [];
+    querySnapshot.forEach(doc => {
+      const campdata = doc.data();
+      stations.push({
+        id: doc.id,
+        ...campdata
+      });
+    });
+    console.log("GetStations", stations);
+    return stations;
+  } catch (err) {
+    console.log("GetStationsError", err);
+  }
+};
+
+export const GetStation = async (docId: string) => {
+  try {
+    const campaignCollection = doc(db, "stations", docId);
+    const querySnapshot: any = await getDoc(campaignCollection);
+    // console.log("GetStation", querySnapshot);
+    return querySnapshot._document.data.value.mapValue.fields;
+  } catch (err) {
+    console.log("GetStationError", err);
+  }
+};
+
+export const GetStationPictures = async (stationId: string) => {
+  try {
+    const campaignCollection = collection(db, "pictures");
+    const querySnapshot = await getDocs(
+      query(campaignCollection, where("stationId", "==", stationId))
+    );
+    const stations: any = [];
+    querySnapshot.forEach(doc => {
+      const campdata = doc.data();
+      stations.push({
+        id: doc.id,
+        ...campdata
+      });
+    });
+    console.log("GetStationPictures", stations);
+    return stations;
+  } catch (err) {
+    console.log("GetStationPicturesError", err);
   }
 };

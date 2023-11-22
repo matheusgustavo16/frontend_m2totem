@@ -10,6 +10,8 @@ export default function RootDashboard({
   children: React.ReactNode
 }) {
 
+  const LIST_ADMINS = process.env.NEXT_EMAIL_ADMIN ? process.env.NEXT_EMAIL_ADMIN.split(',') : [];
+
   const session = useSession({
     required: true,
     onUnauthenticated(){
@@ -18,12 +20,12 @@ export default function RootDashboard({
   });
 
   return (<>
-    {session && session?.data?.user?.email === process.env.NEXT_EMAIL_ADMIN && <>
+    {session && LIST_ADMINS.includes(session?.data?.user?.email as string) && <>
       <LayoutDash>
         {children}
       </LayoutDash>
     </>}
-    {session && session?.data?.user?.email !== process.env.NEXT_EMAIL_ADMIN && <>
+    {session && !LIST_ADMINS.includes(session?.data?.user?.email as string) && <>
       ⚠️ Acesso bloqueado, área somente para administradores.
     </>}
   </>)

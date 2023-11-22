@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const apiUrl = process.env.API_URL || "https://apitotem.westsideco.com.br/api";
+// https://apitotem.westsideco.com.br/api
+const apiUrl = process.env.API_URL || "http://localhost:1337/api";
 
 export const httpClient = axios.create({
   baseURL: apiUrl,

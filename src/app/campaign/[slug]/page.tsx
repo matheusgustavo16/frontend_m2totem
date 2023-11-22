@@ -10,7 +10,7 @@ type PageProps = {
 export default async function PageCampaign({ params: { slug } }: PageProps){
   const campaignData:any = await GetCampaign(slug);
   return (<>
-    <div className="w-full text-center py-8 px-32 flex flex-col">
+    <div className="w-full text-center py-8 lg:px-32 flex flex-col">
       <h3 className="text-4xl font-bold">{campaignData.phrase_1 ? campaignData.phrase_1.stringValue : ``}</h3>
       <span className="my-8 text-2xl font-semibold text-[#D3303D]">{campaignData.phrase_2 ? campaignData.phrase_2.stringValue : ``}</span>
     </div>
