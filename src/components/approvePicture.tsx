@@ -38,7 +38,13 @@ export default function ApprovePictureComponent({
         </ul>
       </div>
       <div className="flex gap-4 my-8 mb-4">
-        <button disabled={!phrase} className="bg-green-600 text-white rounded-full p-2 text-base font-semibold uppercase px-12 disabled:cursor-not-allowed disabled:opacity-25" onClick={() => handleButton(1, phrase)}>aplicar frase!</button>
+        <button
+          disabled={!phrase}
+          className="bg-green-600 text-white rounded-full p-2 text-base font-semibold uppercase px-12 disabled:cursor-not-allowed disabled:opacity-25"
+          onClick={() => handleButton(1, phrase)}
+        >
+          gostei! baixar foto
+        </button>
         <button className="bg-red-500 text-white rounded-full p-2 text-base font-semibold uppercase px-12" onClick={() => handleButton(0)}>refazer foto</button>
       </div>
     </div>

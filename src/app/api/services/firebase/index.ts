@@ -194,6 +194,17 @@ export const GetDownloadPicture = async (docId: string) => {
   }
 };
 
+export const DownloadPicture = async (data: any) => {
+  try {
+    const campaignCollection = collection(db, "downloads");
+    const querySnapshot = await addDoc(campaignCollection, { ...data });
+    // console.log("DownloadPicture", querySnapshot);
+    return querySnapshot ? querySnapshot.id : null;
+  } catch (err) {
+    console.log("DownloadPictureError", err);
+  }
+};
+
 /* STATS */
 
 export const GetStatsDashboard = async () => {
@@ -379,5 +390,60 @@ export const GetStationPictures = async (stationId: string) => {
     return stations;
   } catch (err) {
     console.log("GetStationPicturesError", err);
+  }
+};
+
+/* REPORTS */
+
+export const GetReportsByDate = async (
+  date: string,
+  campaignId: string | null
+) => {
+  try {
+    // COUNT PICTURES
+    const campaignCollection = collection(db, "pictures");
+    const querySnapshot = await getDocs(query(campaignCollection));
+    const pictures: any = [];
+    querySnapshot.forEach(doc => {
+      const campdata = doc.data();
+      if (campdata.createdAt.substr(0, 10) === date) {
+        if (!campaignId || campdata.campaignId === campaignId) {
+          pictures.push({
+            id: doc.id,
+            ...campdata
+          });
+        }
+      }
+    });
+    // COUNT DONWLOADS
+    const downloadCollection = collection(db, "downloads");
+    const queryDownloads = await getDocs(query(downloadCollection));
+    const downloads: any = [];
+    queryDownloads.forEach(doc => {
+      const campdata = doc.data();
+      if (campdata.createdAt.substr(0, 10) === date) {
+        if (!campaignId || campdata.campaignId === campaignId) {
+          downloads.push({
+            id: doc.id,
+            ...campdata
+          });
+        }
+      }
+    });
+
+    // console.log("GetReportsByDate", pictures);
+    let _hourFlow: any = [];
+    pictures.map((pic: any) => {
+      const hour = pic.createdAt.substr(11, 2);
+      _hourFlow[hour] = _hourFlow[hour] ? _hourFlow[hour] + 1 : 1;
+    });
+    // console.log("_hourFlow", _hourFlow);
+    return {
+      countPictures: pictures.length || 0,
+      countDownloads: downloads.length || 0,
+      hourFlow: _hourFlow
+    };
+  } catch (err) {
+    console.log("GetReportsByDateError", err);
   }
 };
