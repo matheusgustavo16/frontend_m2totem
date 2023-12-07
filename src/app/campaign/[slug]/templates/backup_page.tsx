@@ -1,4 +1,5 @@
-'use client'
+{
+  /* 'use client'
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import ApprovePictureComponent from "@/components/approvePicture"
@@ -251,4 +252,5 @@ export default function PageTemplates({ params: { slug } }: PageProps){
       handleButton={onHandleApproveButton}
     />}
   </>)
+} */
 }
