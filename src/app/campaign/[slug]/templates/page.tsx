@@ -308,6 +308,24 @@ export default function PageTemplates({ params: { slug } }: PageProps){
               campaignData.template_campaign.stringValue === 'cocacola' ? <>
                 {!processing && !download && !preview && <>
                   <div className={`w-full text-center py-8 lg:px-12 flex flex-col`}>
+                    {/* USE WEBCAM WHEN STARTS THE PROCCESS */}
+                    <div className="absolute w-full h-full -z-10">
+                      <Webcam
+                        ref={videoRef}
+                        audio={false}
+                        width={75}
+                        height={180}
+                        screenshotFormat="image/jpeg"
+                        screenshotQuality={100}
+                        minScreenshotWidth={1080}
+                        minScreenshotHeight={1920}
+                        videoConstraints={{
+                          width: 1080,
+                          height: 1920,
+                          facingMode: "user"
+                        }}
+                      />
+                    </div>
                     {!template ? <>
                       <div className="w-full text-center flex flex-col mt-24">
                         <span className="text-5xl mb-12 w-2/3 mx-auto font-[BetterWithNarrow] tracking-wide uppercase">escolha um fundo de tela</span>
@@ -341,23 +359,6 @@ export default function PageTemplates({ params: { slug } }: PageProps){
                         </ul>
                       </div>
                     </> : <>
-                      <div className="absolute w-full h-full -z-10">
-                        <Webcam
-                          ref={videoRef}
-                          audio={false}
-                          width={75}
-                          height={180}
-                          screenshotFormat="image/jpeg"
-                          screenshotQuality={100}
-                          minScreenshotWidth={1080}
-                          minScreenshotHeight={1920}
-                          videoConstraints={{
-                            width: 1080,
-                            height: 1920,
-                            facingMode: "user"
-                          }}
-                        />
-                      </div>
                       <div className="w-full my-48">
                         {typeof countdown === 'number' && <CountdownComponentCocaCola seconds={countdown} onFinish={onFinishCountdown} />}
                       </div>
