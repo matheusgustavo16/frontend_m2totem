@@ -64,7 +64,7 @@ export default function PageDownload({ params: { slug, id } }: PageProps){
     }
   }
   
-  return (<>
+  return (!campaignData.template_campaign ? <>
     {loading ? <>
       <div className="mt-12 text-zinc-500 tracking-widest flex flex-col justify-center items-center gap-8">
         <div role="status">
@@ -88,10 +88,26 @@ export default function PageDownload({ params: { slug, id } }: PageProps){
           </>}
         </p>
       </div>
-      {downloadData.picture && <button onClick={handleDownload} className="uppercase absolute flex gap-2 items-center text-white bg-[#D3303D] text-xl p-3 px-12 shadow-lg hover:shadow-xl -bottom-7 border border-white rounded-lg transition duration-300 disabled:cursor-not-allowed disabled:bg-zinc-500 ease-in-out font-semibold hover:bg-red-500">
+      {downloadData.picture && <button onClick={handleDownload} className="uppercase absolute flex gap-2 items-center text-white bg-[#D3303D] text-xl p-3 px-12 shadow-lg hover:shadow-xl bottom-12 border border-white rounded-lg transition duration-300 disabled:cursor-not-allowed disabled:bg-zinc-500 ease-in-out font-semibold hover:bg-red-500">
         <Download />
         baixar foto
       </button>}
     </>}
-  </>)
+  </> : campaignData.template_campaign &&
+              campaignData.template_campaign.stringValue === 'cocacola' ? <>
+                <div className="flex flex-col justify-center items-center mt-24">
+                  {/*<div className="px-16 mb-8 text-center uppercase text-6xl font-[BetterWithNarrow]">{`sua foto está disponível para download!`}</div>*/}
+                  <div className="text-white my-6 relative bg-black/90 min-w-[600px] min-h-[800px] border-2 border-white m-auto flex justify-center items-center overflow-hidden">
+                    {downloadData.picture && <Image src={downloadData.picture.stringValue} fill alt="my picture" />}
+                  </div>
+                  <div className="flex my-8 mb-4">
+                    <button
+                      className="bg-white text-[#df040c] font-[BetterWithNarrow] p-2 text-4xl uppercase px-12 disabled:cursor-not-allowed disabled:opacity-25 hover:scale-105"
+                      onClick={handleDownload}
+                    >
+                      baixar foto
+                    </button>
+                  </div>
+                </div>
+              </> : <></>)
 };

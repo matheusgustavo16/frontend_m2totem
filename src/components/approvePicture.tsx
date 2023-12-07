@@ -3,6 +3,35 @@
 import Image from "next/image";
 import { useState } from "react";
 
+export function ApprovePictureComponentCocaCola({
+  phrase_approve,
+  preview,
+  handleButton
+}: {
+  phrase_approve: string;
+  preview?: any;
+  handleButton: (liked: number, phrase?: string|null) => void;
+}){
+  const [phrase, setPhrase] = useState(null);
+  return (<>
+    <div className="flex flex-col justify-center items-center mt-24">
+      <div className="px-16 mb-8 text-center uppercase text-6xl font-[BetterWithNarrow]">{phrase_approve ? phrase_approve : `Aqui está sua foto! Você pode refazê-la se quiser, ou clique em GOSTEI! para liberar o download.`}</div>
+      <div className="text-white my-6 relative bg-black/90 min-w-[600px] min-h-[800px] border-2 border-white m-auto flex justify-center items-center overflow-hidden">
+        {preview && <Image src={preview} fill alt="preview picture" />}
+      </div>
+      <div className="flex my-8 mb-4">
+        <button
+          className="bg-white text-[#df040c] font-[BetterWithNarrow] p-2 text-4xl uppercase px-12 disabled:cursor-not-allowed disabled:opacity-25 hover:scale-105"
+          onClick={() => handleButton(1)}
+        >
+          gostei
+        </button>
+        <button className="bg-red-800 font-[BetterWithNarrow] text-white p-2 text-4xl uppercase px-12 hover:scale-105" onClick={() => handleButton(0)}>tirar outra foto</button>
+      </div>
+    </div>
+  </>)
+};
+
 export default function ApprovePictureComponent({
   phrase_approve,
   phrases_list,
