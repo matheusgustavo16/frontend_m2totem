@@ -202,8 +202,12 @@ export default function PageTemplates({ params: { slug } }: PageProps){
     }
   };
 
-  useEffect(() => {
+  const activateCountdown = () => {
     if(phrase && template && !countdown) setCountdown(5);
+  }
+
+  useEffect(() => {
+    // if(phrase && template && !countdown) activateCountdown();
   }, [phrase, template]);
 
   return (
@@ -313,24 +317,6 @@ export default function PageTemplates({ params: { slug } }: PageProps){
               campaignData.template_campaign.stringValue === 'cocacola' ? <>
                 {!processing && !download && !preview && <>
                   <div className={`w-full text-center py-8 lg:px-12 flex flex-col`}>
-                    {/* USE WEBCAM WHEN STARTS THE PROCCESS */}
-                    <div className="absolute w-full h-full -z-10">
-                      <Webcam
-                        ref={videoRef}
-                        audio={false}
-                        width={75}
-                        height={180}
-                        screenshotFormat="image/jpeg"
-                        screenshotQuality={100}
-                        minScreenshotWidth={1080}
-                        minScreenshotHeight={1920}
-                        videoConstraints={{
-                          width: 1080,
-                          height: 1920,
-                          facingMode: "user"
-                        }}
-                      />
-                    </div>
                     {!template ? <>
                       <div className="w-full text-center flex flex-col mt-24">
                         <span className="text-5xl mb-12 w-2/3 mx-auto font-[BetterWithNarrow] tracking-wide uppercase">escolha um fundo de tela</span>
@@ -365,10 +351,48 @@ export default function PageTemplates({ params: { slug } }: PageProps){
                         </ul>
                       </div>
                     </> : <>
-                      <div className="w-full my-48">
-                        {typeof countdown === 'number' && <CountdownComponentCocaCola seconds={countdown} onFinish={onFinishCountdown} />}
+                      {/* USE WEBCAM WHEN STARTS THE PROCCESS */}
+                      <div className={`w-full h-full rounded overflow-hidden ${typeof countdown === 'number' ? `absolute -z-10` : `relative my-6`}`}>
+                        <Webcam
+                          ref={videoRef}
+                          audio={false}
+                          width={1080}
+                          height={1920}
+                          screenshotFormat="image/jpeg"
+                          screenshotQuality={100}
+                          minScreenshotWidth={1080}
+                          minScreenshotHeight={1920}
+                          videoConstraints={{
+                            width: 1080,
+                            height: 1920,
+                            facingMode: "user"
+                          }}
+                        />
+                        <div className="absolute w-full h-full left-0 bottom-0">
+                          {template && template.bg && template.bg !== '' && <Image
+                            src={template.bg}
+                            fill
+                            alt="template background" 
+                            style={{
+                              objectFit: "cover",
+                              opacity: .35
+                            }}
+                          />}
+                        </div>
                       </div>
-                      <div className="text-center select-none w-full">
+                      {typeof countdown === 'number' ? <div className="w-full my-48">
+                        <CountdownComponentCocaCola seconds={countdown} onFinish={onFinishCountdown} />
+                      </div> : <>
+                        <div className="w-full flex justify-center items-start">
+                            <button
+                              onClick={activateCountdown}
+                              className="bg-white text-[#df040c] font-[BetterWithNarrow] p-5 text-6xl uppercase px-12 disabled:cursor-not-allowed disabled:opacity-25 hover:scale-105"
+                            >
+                              Capturar Foto
+                            </button>
+                          </div>
+                      </>}
+                      <div className="text-center select-none w-full mt-24">
                         <Image src="/assets/templates/cocacola/enfeites-termos.png" width={500} height={150} alt="enfeites" className="mx-auto" />
                       </div>
                     </>}

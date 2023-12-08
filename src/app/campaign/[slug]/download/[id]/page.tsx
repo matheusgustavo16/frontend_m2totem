@@ -5,6 +5,7 @@ import Image from "next/image";
 import { DownloadPicture, GetCampaign, GetDownloadPicture } from "@/app/api/services/firebase";
 import { Camera, Download } from "lucide-react";
 import { saveAs } from 'file-saver';
+import Link from "next/link";
 
 type PageProps = {
   params: {
@@ -143,12 +144,14 @@ export default function PageDownload({ params: { slug, id } }: PageProps){
                     />}
                   </div>
                   <div className="flex my-8 mb-4">
-                    {downloadData.picture && <button
+                    {downloadData.picture && <Link
+                      href={downloadData.picture.stringValue}
+                      onClick={() => saveApiDownload(slug, id, JSON.stringify({ }))}
+                      target="_blank"
                       className="bg-white text-[#df040c] font-[BetterWithNarrow] p-2 text-4xl uppercase px-12 disabled:cursor-not-allowed disabled:opacity-25 hover:scale-105"
-                      onClick={handleDownload}
                     >
                       baixar foto
-                    </button>}
+                    </Link>}
                   </div>
                 </div>
               </> : <></>)
