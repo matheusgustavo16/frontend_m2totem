@@ -97,7 +97,7 @@ export const GetTemplates = async (campaignId: string) => {
       }
     });
     // console.log("GetTemplates", campaigns);
-    return campaigns;
+    return campaigns.reverse();
   } catch (err) {
     console.log("GetTemplatesError", err);
   }

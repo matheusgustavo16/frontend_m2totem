@@ -27,6 +27,8 @@ export default function PageTemplates({ params: { slug } }: PageProps){
   });
   const [template, setTemplate] = useState<any>(null);
   const [phrase, setPhrase] = useState<any>(null);
+  
+  const [loadingLike, setLoadingLike] = useState<boolean>(false);
 
   const [templates, setTemplates] = useState<any>([]);
   const [phrases, setPhrases] = useState<any>([]);
@@ -126,6 +128,7 @@ export default function PageTemplates({ params: { slug } }: PageProps){
   }, [countdownHome])
 
   const handleUploadFile = async (imageFile: any) => {
+    setLoadingLike(true);
     if(imageFile){
       try {
         const name = new Date().getTime();
@@ -151,6 +154,8 @@ export default function PageTemplates({ params: { slug } }: PageProps){
           })
         }catch(err){
           console.log('handleUploadFileError', err);
+        } finally {
+          setLoadingLike(false);
         }
     }else{
       console.log('Selecione arquivo valido');
@@ -329,16 +334,17 @@ export default function PageTemplates({ params: { slug } }: PageProps){
                     {!template ? <>
                       <div className="w-full text-center flex flex-col mt-24">
                         <span className="text-5xl mb-12 w-2/3 mx-auto font-[BetterWithNarrow] tracking-wide uppercase">escolha um fundo de tela</span>
-                        <ul className="my-4 mx-auto grid grid-cols-3 text-center gap-4">
+                        <ul className="my-4 mx-auto w-full flex flex-wrap text-center relative gap-4 justify-center">
                           {templates.length>=1 && templates.map((temp:any, k:number) => <li
                             key={k}
                             onClick={() => setTemplate(temp)}
-                            className="h-96 w-52 rounded bg-black cursor-pointer relative overflow-hidden border-4 hover:border-8 transition duration-300 ease-in-out border-white"
+                            className="w-[30%] min-h-[450px] relative"
                           >
                             <Image
                               src={`${temp.bg}`}
+                              className="rounded bg-black cursor-pointer overflow-hidden border-4 hover:border-8 transition duration-300 ease-in-out border-white"
                               fill
-                              alt="template" 
+                              alt="template"
                               style={{
                                 objectFit: "cover"
                               }}
@@ -381,6 +387,7 @@ export default function PageTemplates({ params: { slug } }: PageProps){
                   </div>
                 </>}
                 {!download && preview && preview !== "" && <ApprovePictureComponentCocaCola
+                  loading={loadingLike}
                   phrase_approve={campaignData.phrase_approve ? campaignData.phrase_approve.stringValue : null}
                   preview={preview}
                   handleButton={onHandleApproveButtonCocaCola}
@@ -402,7 +409,7 @@ export default function PageTemplates({ params: { slug } }: PageProps){
                       />}
                     </div>
                     <div className="my-12 text-5xl font-[TCCCHolidays23Curated]">Viva a magia do natal!</div>
-                    <Image src="/assets/templates/cocacola/noel-left.png" width={591} height={690} alt="papai noel 2" className="absolute bottom-0 left-0 select-none" />
+                    <Image src="/assets/templates/cocacola/noel-left.png" width={391} height={490} alt="papai noel 2" className="absolute bottom-0 left-0 select-none" />
                     <button disabled className="uppercase absolute text-white bg-[#D3303D] text-xl p-3 px-12 shadow-lg hover:shadow-xl bottom-12 border border-white rounded-lg transition duration-300 disabled:cursor-not-allowed disabled:bg-zinc-500 ease-in-out font-semibold hover:bg-red-500">
                       redirecionando em {countdownHome||99} segundos...
                     </button>

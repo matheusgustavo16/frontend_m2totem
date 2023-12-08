@@ -4,10 +4,12 @@ import Image from "next/image";
 import { useState } from "react";
 
 export function ApprovePictureComponentCocaCola({
+  loading,
   phrase_approve,
   preview,
   handleButton
 }: {
+  loading?: boolean;
   phrase_approve: string;
   preview?: any;
   handleButton: (liked: number, phrase?: string|null) => void;
@@ -21,12 +23,19 @@ export function ApprovePictureComponentCocaCola({
       </div>
       <div className="flex my-8 mb-4">
         <button
+          disabled={loading}
           className="bg-white text-[#df040c] font-[BetterWithNarrow] p-2 text-4xl uppercase px-12 disabled:cursor-not-allowed disabled:opacity-25 hover:scale-105"
           onClick={() => handleButton(1)}
         >
           gostei
         </button>
-        <button className="bg-red-800 font-[BetterWithNarrow] text-white p-2 text-4xl uppercase px-12 hover:scale-105" onClick={() => handleButton(0)}>tirar outra foto</button>
+        <button
+          disabled={loading}
+          className="bg-red-800 font-[BetterWithNarrow] text-white p-2 text-4xl uppercase px-12 disabled:cursor-not-allowed disabled:opacity-25 hover:scale-105"
+          onClick={() => handleButton(0)}
+        >
+          tirar outra foto
+        </button>
       </div>
     </div>
   </>)
