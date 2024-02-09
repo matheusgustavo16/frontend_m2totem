@@ -1,21 +1,21 @@
-import type { Metadata } from 'next'
-import { Jost } from 'next/font/google'
-import './globals.css'
-import SessionProvider from '@/context/sessionProvider'
-import { Toaster } from 'react-hot-toast'
-import NextTopLoader from 'nextjs-toploader'
+import type { Metadata } from "next";
+import { Jost } from "next/font/google";
+import "./globals.css";
+import SessionProvider from "@/context/sessionProvider";
+import { Toaster } from "react-hot-toast";
+import NextTopLoader from "nextjs-toploader";
 
-const jost = Jost({ subsets: ['latin'] })
+const jost = Jost({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Totem de Fotos',
-  description: 'Totem de fotos personalizadas',
-}
+  title: "Totem de Fotos",
+  description: "Totem de fotos personalizadas"
+};
 
 export default function RootLayout({
-  children,
+  children
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html className="h-full w-full" lang="pt-br">
@@ -29,12 +29,9 @@ export default function RootLayout({
             showSpinner={false}
             easing="ease"
           />
-          <Toaster
-            position="bottom-right"
-            reverseOrder={false}
-          />
+          <Toaster position="bottom-right" reverseOrder={false} />
         </SessionProvider>
       </body>
     </html>
-  )
+  );
 }
